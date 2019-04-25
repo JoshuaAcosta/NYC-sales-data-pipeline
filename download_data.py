@@ -8,25 +8,25 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
-# Pandas setting
-#pd.set_option('max_columns', 50)
-
 def get_sales_links(url):
     """
     Get links to excel spreadsheets by year and borough from NYC
     Department of Finance website.
     """
+    try:
+        base = "https://www1.nyc.gov"
+        website_text = requests.get(url).text
+        soup = BeautifulSoup(website_text, "html5lib")
+        links = soup.select("a[href$='.xls']")
 
-    base = "https://www1.nyc.gov"
-    website_text = requests.get(url).text
-    soup = BeautifulSoup(website_text, "html5lib")
-    links = soup.select("a[href$='.xls']")
+        list_of_urls = [base + each['href'] for each in links]
 
-    list_of_urls = [base + each['href'] for each in links]
+        del list_of_urls[:8]
+        sales_list_11_17 = list_of_urls[0:35]
+        sales_list_03_10 = list_of_urls[35:]
 
-    new_list = list_of_urls[8:]
-    sales_list_11_17 = new_list[0:35]
-    sales_list_03_10 = new_list[35:]
+    except requests.RequestException as exception:
+        return exception
 
     return sales_list_11_17, sales_list_03_10
 
@@ -55,7 +55,6 @@ def download_files(list_of_urls, data_directory):
         response = requests.get(each)
         filename = each.rsplit('/', 1)[-1]
         path = data_directory + filename
-        print(path)
 
         if filename in data_directory:
             continue
