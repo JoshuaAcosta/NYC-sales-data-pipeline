@@ -67,8 +67,8 @@ if __name__ == "__main__":
 
     SALES_DATA_URL = "https://www1.nyc.gov/site/finance/taxes/property-annualized-sales-update.page"
 
-    LIST_2011_2017, LIST_2003_2010 = get_sales_links(SALES_DATA_URL)
+    sales_2011_2017, sales_2003_2010 = get_sales_links(SALES_DATA_URL)
 
-    download_files(LIST_2011_2017, "data/archived 2011-2017/")
+    download_files(sales_2011_2017, "data/archived 2011-2017/")
 
-    download_files(LIST_2003_2010, "data/archived 2003-2010/")
+    download_files(sales_2003_2010, "data/archived 2003-2010/")
