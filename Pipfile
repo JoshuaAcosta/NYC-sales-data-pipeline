@@ -13,6 +13,7 @@ pylint = "*"
 lxml = "*"
 html5lib = "*"
 soupsieve = "*"
+xlrd = "*"
 
 [requires]
 python_version = "3.6"
