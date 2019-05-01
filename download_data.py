@@ -4,7 +4,9 @@ Department of Finance website for property sales between 2003 and 2017.
 """
 
 import os
+import glob
 
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
@@ -17,18 +19,18 @@ def get_sales_links(url):
         base = "https://www1.nyc.gov"
         website_text = requests.get(url).text
         soup = BeautifulSoup(website_text, "html5lib")
-        links = soup.select("a[href$='.xls']")
+        links = soup.select("a[href*='.xls']")
 
         list_of_urls = [base + each['href'] for each in links]
 
-        del list_of_urls[:8]
-        sales_list_11_17 = list_of_urls[0:35]
-        sales_list_03_10 = list_of_urls[35:]
+        del list_of_urls[:17]
+        sales_list_11_18 = list_of_urls[0:40]
+        sales_list_03_10 = list_of_urls[40:]
 
     except requests.RequestException as exception:
         return exception
 
-    return sales_list_11_17, sales_list_03_10
+    return sales_list_11_18, sales_list_03_10
 
 def check_for_data_dir(directory):
     """
@@ -38,37 +40,42 @@ def check_for_data_dir(directory):
 
     if not os.path.isdir("data/"):
         os.mkdir("data/")
-    if os.path.isdir(directory):
-        print(directory + " already exists")
-    else:
-        os.mkdir(directory)
-        print(directory + " created")
 
-def download_files(list_of_urls, data_directory):
+def read_excel_data(list_of_urls, skip_rows_num):
     """
-    Writes NYC property sales data from NYC Dept of Finance
-    into a spreadsheet in the data directory.
+    Reads all .xls url links into pandas, selects specific columns.
     """
-    check_for_data_dir(data_directory)
 
-    for each in list_of_urls:
-        response = requests.get(each)
-        filename = each.rsplit('/', 1)[-1]
-        path = data_directory + filename
+    use_col_names = ["BOROUGH", "NEIGHBORHOOD", "BUILDING CLASS CATEGORY",\
+                     "ADDRESS", "APARTMENT NUMBER", "ZIP CODE",\
+                     "RESIDENTIAL UNITS", "COMMERCIAL UNITS", "TOTAL UNITS",\
+                     "LAND SQUARE FEET", "GROSS SQUARE FEET", "YEAR BUILT",\
+                     "BUILDING CLASS AT TIME OF SALE",\
+                     "SALE PRICE", "SALE DATE"]
 
-        if filename in data_directory:
-            continue
-        else:
-            with open(path, 'wb') as file:
-                for chunk in response.iter_content(chunk_size=5000):
-                    file.write(chunk)
+    col_str = "A:C,I:Q, S, T, U"
+
+    list_of_dfs = [pd.read_excel(filename, skiprows=skip_rows_num, dtype=str,\
+                    usecols=col_str, names=use_col_names) for filename in list_of_urls]
+
+    df = pd.concat(list_of_dfs, ignore_index=True, sort=False)
+    
+    return df
+
+def concat_dfs():
+    """Combines all dataframes created from separate spreadsheets """
+    sales_data_url = "https://www1.nyc.gov/site/finance/taxes/property-annualized-sales-update.page"
+    sales_2011_2018, sales_2003_2010 = get_sales_links(sales_data_url)
+
+    archived_2011_2018_df = read_excel_data(sales_2011_2018, 4)
+    archived_2003_2010_df = read_excel_data(sales_2003_2010, 3)
+
+    combined_df = pd.concat([archived_2011_2018_df, archived_2003_2010_df], ignore_index=True, sort=False)
+
+    check_for_data_dir("data/")
+
+    combined_df.to_csv("data/NYC_sales_data.csv")
 
 if __name__ == "__main__":
 
-    SALES_DATA_URL = "https://www1.nyc.gov/site/finance/taxes/property-annualized-sales-update.page"
-
-    sales_2011_2017, sales_2003_2010 = get_sales_links(SALES_DATA_URL)
-
-    download_files(sales_2011_2017, "data/archived 2011-2017/")
-
-    download_files(sales_2003_2010, "data/archived 2003-2010/")
+    concat_dfs()
