@@ -1,13 +1,10 @@
 """
 Cleans and dedupes data.
 """
-<<<<<<< HEAD
 import numpy as np
 import pandas as pd
 
 from combine_spreadsheets import combined_df
-=======
->>>>>>> 36bae1701b2061d3b2b58e106e1e2bad619773f7
 
 def clean_column_names(df):
     """Changes pandas column names to be more pythonic """
@@ -25,7 +22,6 @@ def dedupe_rows(df):
     df.drop_duplicates()
     return df
 
-<<<<<<< HEAD
 def clean_dtypes(df):
     """
     Replaces empty excel cells with nulls, updates dtypes for columns.
@@ -44,13 +40,8 @@ def clean_dtypes(df):
 
     return df
 
-=======
->>>>>>> 36bae1701b2061d3b2b58e106e1e2bad619773f7
 if __name__ == "__main__":
     combined_df = clean_column_names(combined_df)
     combined_df = clean_neighborhood_names(combined_df)
     combined_df = dedupe_rows(combined_df)
-<<<<<<< HEAD
     combined_df = clean_dtypes(combined_df)
-=======
->>>>>>> 36bae1701b2061d3b2b58e106e1e2bad619773f7
