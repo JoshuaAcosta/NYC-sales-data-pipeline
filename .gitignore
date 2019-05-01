@@ -108,5 +108,3 @@ venv.bak/
 
 #jupyter notebooks
 *.ipynb
-
-data/*
