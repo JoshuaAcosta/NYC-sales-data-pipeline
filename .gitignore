@@ -108,3 +108,6 @@ venv.bak/
 
 #jupyter notebooks
 *.ipynb
+
+#data dir containing csv files
+/data/*

@@ -4,44 +4,63 @@ Cleans and dedupes data.
 import numpy as np
 import pandas as pd
 
-from combine_spreadsheets import combined_df
-
 def clean_column_names(df):
-    """Changes pandas column names to be more pythonic """
-    df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')\
-                                .str.replace('(', '').str.replace(')', '')
-    return df
-
+    df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
+    
+    
 def clean_neighborhood_names(df):
-    """Removes whitespace in neighborhood names """
     df["neighborhood"] = df["neighborhood"].apply(str.rstrip)
-    return df
-
+    
+    
 def dedupe_rows(df):
-    """Dedupes similar rows """
     df.drop_duplicates()
+
+
+def update_dtypes(df):
+    update_cols_dtype = {"sale_price":"float64", "sale_date":"datetime64[ns]",\
+                        "land_square_feet":"int64", "gross_square_feet":"int64",\
+                         "zip_code": "int16","residential_units": "int16",\
+                         "commercial_units": "int16", "total_units" : "int16", "year_built":"int16"}
+    
+    df = df.astype(update_cols_dtype)
     return df
 
-def clean_dtypes(df):
-    """
-    Replaces empty excel cells with nulls, updates dtypes for columns.
-    """
-    df.replace(r'^\s+$', np.nan, regex=True)
+def clean_neighborhood_values(df):
+    df["neighborhood"].replace('1026','MIDTOWN EAST', inplace=True)
+    df["neighborhood"].replace('3019','CROWN HEIGHTS', inplace=True)
+    df["neighborhood"].replace('3004','BATH BEACH', inplace=True)
+    df["neighborhood"].replace('1021','LITTLE ITALY', inplace=True)
+    
 
-    update_cols_dtype = {"borough": "category", "sale_price":"float64",\
-                        "sale_date":"datetime64[ns]",\
-                        "zip_code":"int16", "residential_units":"int16",\
-                        "commercial_units":"int16", "total_units":"int16",\
-                        "land_square_feet":"int64", "gross_square_feet":"int64"}
+def clean_year_built(df):
+    df.loc[df.address == "762 MARCY AVENUE, 1B", 'year_built'] = 2018
+    df.loc[df.address == "762 MARCY AVENUE, 4", 'year_built'] = 2018
+    df.loc[df.address == "9 BARTLETT AVENUE, 0", 'year_built'] = 2018
+    
+def clean_zip_code(df):
+    df.loc[df.address == "762 MARCY AVENUE, 1B", 'zip_code'] = 11216
+    df.loc[df.address == "762 MARCY AVENUE, 4", 'zip_code'] = 11216
 
-    combined_df = combined_df.astype(update_cols_dtype)
+def fill_na(df):
+    df.update(df[["residential_units","commercial_units", "total_units", "land_square_feet", "gross_square_feet"]].fillna(0.0))
 
-    combined_df.year_built = combined_df.year_built.astype('float').astype(pd.Int16Dtype())
+def update_borough_values(df):
+    
+    df["borough"].replace({1 : "Manhattan", 2 : "Bronx", 3 : "Brooklyn", 4 : "Queens", 5 : "Staten Island"},inplace=True)
 
-    return df
-
+def clean_data_to_csv(df):
+    
+    df.to_csv("data/Clean_NYC_sales_data.csv")
+    
 if __name__ == "__main__":
-    combined_df = clean_column_names(combined_df)
-    combined_df = clean_neighborhood_names(combined_df)
-    combined_df = dedupe_rows(combined_df)
-    combined_df = clean_dtypes(combined_df)
+    df = pd.read_csv("data/NYC_sales_data.csv", index_col=0)
+    clean_column_names(df)
+    clean_neighborhood_names(df)
+    dedupe_rows(df)
+    clean_neighborhood_values(df)
+    clean_year_built(df)
+    clean_zip_code(df)
+    fill_na(df)
+    update_borough_values(df)
+    df = update_dtypes(df)
+    clean_data_to_csv(df)
