@@ -42,7 +42,6 @@ def copy_data(file):
     with open(file, "r") as f:
         next(f) 
         cur.copy_from(f, 'transactions', sep=",")
-    conn.commit()
     conn.close()
 
 if __name__ == "__main__":
