@@ -4,7 +4,6 @@ Department of Finance website for property sales between 2003 and 2017.
 """
 
 import os
-import glob
 
 import pandas as pd
 import requests
@@ -33,7 +32,7 @@ def get_sales_links(url):
 
     return sales_list_11_18, sales_list_03_10
 
-def check_for_data_dir(directory):
+def check_for_data_dir():
     """
     Check parent directory for a directory named data.
     Downloaded files containing data will be stored here
@@ -58,9 +57,9 @@ def read_excel_data(list_of_urls, skip_rows_num):
     list_of_dfs = [pd.read_excel(filename, skiprows=skip_rows_num, dtype=str,\
                     usecols=col_str, names=use_col_names) for filename in list_of_urls]
 
-    df = pd.concat(list_of_dfs, ignore_index=True, sort=False)
-    
-    return df
+    dataframe = pd.concat(list_of_dfs, ignore_index=True, sort=False)
+
+    return dataframe
 
 def concat_dfs():
     """Combines all dataframes created from separate spreadsheets """
@@ -70,13 +69,13 @@ def concat_dfs():
     archived_2011_2018_df = read_excel_data(sales_2011_2018, 4)
     archived_2003_2010_df = read_excel_data(sales_2003_2010, 3)
 
-    combined_df = pd.concat([archived_2011_2018_df, archived_2003_2010_df], ignore_index=True, sort=False)
+    combined_df = pd.concat([archived_2011_2018_df, archived_2003_2010_df],\
+                            ignore_index=True, sort=False)
 
-    check_for_data_dir("data/")
+    check_for_data_dir()
 
     combined_df.to_csv("data/NYC_sales_data.csv")
 
 if __name__ == "__main__":
 
     concat_dfs()
-
