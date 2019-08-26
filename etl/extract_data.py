@@ -16,6 +16,7 @@ def get_sales_links(url):
     Department of Finance website.
     """
     try:
+        print("Getting list of urls...")
         base = "https://www1.nyc.gov"
         website_text = requests.get(url).text
         soup = BeautifulSoup(website_text, "html5lib")
@@ -39,8 +40,9 @@ def check_for_data_dir():
     Downloaded files containing data will be stored here
     """
 
-    if not os.path.isdir("data/"):
-        os.mkdir("data/")
+    if not os.path.isdir("../data/"):
+        print("Creating a data directory...")
+        os.mkdir("../data/")
 
 
 def read_excel_data(list_of_urls, skip_rows_num):
@@ -70,19 +72,26 @@ def concat_dfs():
     Combines all dataframes created
     from separate spreadsheets
     """
-    sales_data_url = "https://www1.nyc.gov/site/\
-                    finance/taxes/property-annualized-sales-update.page"
+    sales_data_url = ("https://www1.nyc.gov/site/"
+                      "finance/taxes/property-annualized-sales-update.page")
+
     sales_2011_2018, sales_2003_2010 = get_sales_links(sales_data_url)
 
+    print("Creating dataframes for years 2011 through 2018...")
     archived_2011_2018_df = read_excel_data(sales_2011_2018, 4)
+    print("Creating dataframes for years 2003 through 2010..")
     archived_2003_2010_df = read_excel_data(sales_2003_2010, 3)
+
+    print("Concatenating all dataframes...")
 
     combined_df = pd.concat([archived_2011_2018_df, archived_2003_2010_df],
                             ignore_index=True, sort=False)
 
     check_for_data_dir()
 
-    combined_df.to_csv("data/NYC_sales_data.csv")
+    print("Saving csv file into /data")
+
+    combined_df.to_csv("../data/NYC_sales_data.csv")
 
 
 if __name__ == "__main__":
