@@ -80,6 +80,28 @@ def split_address_apt(df):
         df2.at[index_label, 'apartment_number'] = apt_num
     df.update(df2)
 
+def calcualte_dollar_per_sqft(df):
+    """divides the sale price of the transaction by the gross square feet of the property"""
+
+    df["dollar_per_square_foot"] = df["sale_price"] / df["gross_square_feet"]
+
+def clean_building_class_values(df):
+    """ 
+    Replaces double spaces with one space in strings and 
+    combines multiple names for the same category.
+    """
+
+    df["building_class_category"] = df["building_class_category"].str.replace('  ',' ')
+
+    replacement_values = {'01 ONE FAMILY DWELLINGS': '01 ONE FAMILY HOMES',
+                      '02 TWO FAMILY DWELLINGS': '02 TWO FAMILY HOMES',
+                      '03 THREE FAMILY DWELLINGS': '03 THREE FAMILY HOMES',
+                      '17 CONDOPS': '17 CONDO COOPS',
+                      '18 TAX CLASS 3 - UNTILITY PROPERTIES': '18 TAX CLASS 3 - UTILITY PROPERTIES'}
+
+    df["building_class_category"] = df["building_class_category"].replace(replacement_values)
+
+
 def clean_data_to_csv(df, filename):
     """
     saves dataframe in csv format to data directory
@@ -99,4 +121,6 @@ if __name__ == "__main__":
     split_address_apt(df)
     clean_apt_nums(df)
     update_dtypes(df)
+    calcualte_dollar_per_sqft(df)
+    clean_building_class_values(df)
     clean_data_to_csv(df, "data/Clean_NYC_sales_data.csv")
