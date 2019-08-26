@@ -13,7 +13,7 @@ def load_data(file):
     cur = conn.cursor()
     with open(file, "r") as f:
         next(f)
-        cur.copy_from(f, 'transactions', sep=",")
+        cur.copy_from(f, 'transactions', sep=",", null='')
     conn.close()
 
 if __name__ == "__main__":

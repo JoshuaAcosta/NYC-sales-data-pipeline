@@ -22,6 +22,7 @@ class Transaction(db.Model):
     building_class_at_time_of_sale = db.Column(db.String)
     sale_price = db.Column(db.Numeric)
     sale_date = db.Column(db.Date)
+    dollar_per_square_foot = db.Column(db.Numeric)
 
     def __repr__(self):
         return '<Transaction %r>' % self.id

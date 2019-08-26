@@ -84,6 +84,8 @@ def calcualte_dollar_per_sqft(df):
     """divides the sale price of the transaction by the gross square feet of the property"""
 
     df["dollar_per_square_foot"] = df["sale_price"] / df["gross_square_feet"]
+    df["dollar_per_square_foot"] = df["dollar_per_square_foot"].replace(np.inf, np.nan)
+    df["dollar_per_square_foot"]= df["dollar_per_square_foot"].round(2)
 
 def clean_building_class_values(df):
     """ 
@@ -109,18 +111,32 @@ def clean_data_to_csv(df, filename):
     df.to_csv(filename)
 
 if __name__ == "__main__":
-    df = pd.read_csv("data/NYC_sales_data.csv", index_col=0)
+    print("Reading csv data file..")
+    df = pd.read_csv("../data/NYC_sales_data.csv", index_col=0)
+    print("Cleaning column names..")
     clean_column_names(df)
+    print("Cleaning neighborhood names..")
     clean_neighborhood_names(df)
+    print("Deduping rows..")
     dedupe_rows(df)
+    print("Filling na values..")
     df = fill_na(df)
+    print("Cleaning year built values..")
     clean_year_built(df)
+    print("Cleaning zip code values..")
     clean_zip_code(df)
+    print("Cleaning neighborhood name values..")
     clean_neighborhood_values(df)
+    print("Updating borough values..")
     update_borough_values(df)
+    print("Splitting apartment number from address column..")
     split_address_apt(df)
     clean_apt_nums(df)
+    print("Updating data types..")
     update_dtypes(df)
+    print("Calculating dollar per squared foot per transcation..")
     calcualte_dollar_per_sqft(df)
+    print("Cleaning up building class values..")
     clean_building_class_values(df)
-    clean_data_to_csv(df, "data/Clean_NYC_sales_data.csv")
+    print("Saving cleaned csv file to data directory")
+    clean_data_to_csv(df, "../data/Clean_NYC_sales_data.csv")
