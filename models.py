@@ -1,5 +1,6 @@
 """Database model"""
 from api import db
+from marshmallow import Schema, fields
 
 
 class Transaction(db.Model):
@@ -20,9 +21,33 @@ class Transaction(db.Model):
     gross_square_feet = db.Column(db.Integer)
     year_built = db.Column(db.Integer)
     building_class_at_time_of_sale = db.Column(db.String)
-    sale_price = db.Column(db.Numeric)
+    sale_price = db.Column(db.Float)
     sale_date = db.Column(db.Date)
-    dollar_per_square_foot = db.Column(db.Numeric)
+    dollar_per_square_foot = db.Column(db.Float)
 
     def __repr__(self):
         return '<Transaction %r>' % self.id
+
+
+class TransactionSchema(Schema):
+    """Marshmallow schema"""
+    id = fields.Integer()
+    borough = fields.Str()
+    neighborhood = fields.Str()
+    building_class_category = fields.Str()
+    address = fields.Str()
+    apartment_number = fields.Str()
+    zip_code = fields.Integer()
+    residential_units = fields.Integer()
+    commercial_units = fields.Integer()
+    total_units = fields.Integer()
+    land_square_feet = fields.Integer()
+    gross_square_feet = fields.Integer()
+    year_built = fields.Integer()
+    building_class_at_time_of_sale = fields.Str()
+    sale_price = fields.Float()
+    sale_date = fields.Date()
+    dollar_per_square_foot = fields.Float()
+
+transaction_schema = TransactionSchema(many=True)
+

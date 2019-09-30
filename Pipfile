@@ -17,6 +17,8 @@ xlrd = "*"
 psycopg2 = "==2.7.5"
 flask = "*"
 flask-sqlalchemy = "*"
+flask-restful = "*"
+marshmallow = "*"
 
 [requires]
 python_version = "3.6"
