@@ -92,7 +92,8 @@ def clean_building_class_values(df):
     Replaces double spaces with one space in strings and 
     combines multiple names for the same category.
     """
-
+    df["building_class_category"] = df["building_class_category"].apply(str.strip)
+    
     df["building_class_category"] = df["building_class_category"].str.replace('  ',' ')
 
     replacement_values = {'01 ONE FAMILY DWELLINGS': '01 ONE FAMILY HOMES',
