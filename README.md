@@ -24,8 +24,6 @@ FLASK_ENV=development
 DATABASE_URL= ADD YOUR DATABASE PATH HERE
 SECRET_KEY= ADD YOUR SECRET KEY
 
-#set up Postgres
-
 #run etl scripts
 $ cd etl
 $ python extract_data.py
