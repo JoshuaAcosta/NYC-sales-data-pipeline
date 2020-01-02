@@ -1,10 +1,9 @@
 """
-Downloads excel spreadsheets by year and borough from NYC
-Department of Finance website for property sales between 2003 and 2017.
+Collects excel spreadsheets data by year and borough from NYC
+Department of Finance website for property sales between 2003 and 2018.
 """
 
 import os
-
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -12,8 +11,10 @@ from bs4 import BeautifulSoup
 
 def get_sales_links(url):
     """
-    Get links to excel spreadsheets by year and borough from NYC
-    Department of Finance website.
+    Get links to excel spreadsheets by year (from 2003 to 2018) and 
+    borough from NYC Department of Finance website.
+    Two seperate lists are created due to the change in which row
+    column headers begin after 2010.
     """
     try:
         print("Getting list of urls...")
@@ -37,7 +38,8 @@ def get_sales_links(url):
 def check_for_data_dir():
     """
     Check parent directory for a directory named data.
-    Downloaded files containing data will be stored here
+    One is created if it doesn't exist to store .csv file
+    containing all transactions.
     """
 
     if not os.path.isdir("../data/"):
@@ -47,7 +49,11 @@ def check_for_data_dir():
 
 def read_excel_data(list_of_urls, skip_rows_num):
     """
-    Reads all .xls url links into pandas, selects specific columns.
+    Creates a list of dataframes, one df per spreadsheet, and then concats them into
+    one combined dataframe. For each spreadsheet, columns desired are specified.
+    Tax related columns and those with mostly null values are not added.
+    Numeber of rows to skip for each df is specific due to change made by NY DOF 
+    after 2010.
     """
     use_col_names = ["BOROUGH", "NEIGHBORHOOD", "BUILDING CLASS CATEGORY",
                      "ADDRESS", "APARTMENT NUMBER", "ZIP CODE",
@@ -69,8 +75,9 @@ def read_excel_data(list_of_urls, skip_rows_num):
 
 def concat_dfs():
     """
-    Combines all dataframes created
-    from separate spreadsheets
+    Combines all dataframes created from separate spreadsheets.
+    Saves one .csv file with all transactions under the data directory.
+
     """
     sales_data_url = ("https://www1.nyc.gov/site/"
                       "finance/taxes/property-annualized-sales-update.page")
