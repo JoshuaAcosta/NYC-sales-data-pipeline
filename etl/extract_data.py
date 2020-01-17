@@ -26,13 +26,13 @@ def get_sales_links(url):
         list_of_urls = [base + each['href'] for each in links]
 
         del list_of_urls[:17]
-        sales_list_11_18 = list_of_urls[0:40]
+        sales_list_11_onward = list_of_urls[0:40]
         sales_list_03_10 = list_of_urls[40:]
 
     except requests.RequestException as exception:
         return exception
 
-    return sales_list_11_18, sales_list_03_10
+    return sales_list_11_onward, sales_list_03_10
 
 
 def check_for_data_dir():
@@ -59,10 +59,11 @@ def read_excel_data(list_of_urls, skip_rows_num):
                      "ADDRESS", "APARTMENT NUMBER", "ZIP CODE",
                      "RESIDENTIAL UNITS", "COMMERCIAL UNITS", "TOTAL UNITS",
                      "LAND SQUARE FEET", "GROSS SQUARE FEET", "YEAR BUILT",
+                     "TAX CLASS AT TIME OF SALE",
                      "BUILDING CLASS AT TIME OF SALE",
                      "SALE PRICE", "SALE DATE"]
 
-    col_str = "A:C,I:Q, S, T, U"
+    col_str = "A:C,I:U"
 
     list_of_dfs = [pd.read_excel(filename, skiprows=skip_rows_num,
                    dtype=str, usecols=col_str, names=use_col_names)
@@ -82,16 +83,16 @@ def concat_dfs():
     sales_data_url = ("https://www1.nyc.gov/site/"
                       "finance/taxes/property-annualized-sales-update.page")
 
-    sales_2011_2018, sales_2003_2010 = get_sales_links(sales_data_url)
+    sales_2011_onward, sales_2003_2010 = get_sales_links(sales_data_url)
 
-    print("Creating dataframes for years 2011 through 2018...")
-    archived_2011_2018_df = read_excel_data(sales_2011_2018, 4)
+    print("Creating dataframes for years 2011 and onward...")
+    archived_2011_onward_df = read_excel_data(sales_2011_onward, 4)
     print("Creating dataframes for years 2003 through 2010..")
     archived_2003_2010_df = read_excel_data(sales_2003_2010, 3)
 
     print("Concatenating all dataframes...")
 
-    combined_df = pd.concat([archived_2011_2018_df, archived_2003_2010_df],
+    combined_df = pd.concat([archived_2011_onward_df, archived_2003_2010_df],
                             ignore_index=True, sort=False)
 
     check_for_data_dir()
